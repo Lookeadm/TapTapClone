@@ -1,68 +1,89 @@
-import { View, Text } from 'react-native'
-import React from 'react'
-import { StarOutlined } from '@ant-design/icons'
-import { DividerComponent, RowComponent, SpaceComponent, TextComponent } from '../../../components'
-import { appColors } from '../../../constants/appColors'
+import React from 'react';
+import { View, Text, TouchableOpacity } from 'react-native';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 
-// Tách Star Component ra ngoài để tránh re-render không cần thiết
-const Star = ({ count }) => (
-    <View style={{ width: 50 }}>
-        <RowComponent styles={{ marginBottom: 3 }}>
-            {Array.from({ length: count }, (_, index) => (
-                <StarOutlined
-                    key={index}
-                    style={{ fontSize: 11, color: appColors.gray }}
-                />
-            ))}
-        </RowComponent>
-    </View>
-);
-
-const RatingComponent = () => {
-    // Dùn map thay vì while
-    const rating = Array.from({ length: 5 }, (_, i) => (
-        <RowComponent key={i} style={{ flexDirection: 'row-reverse' }}>
-            {Star(i+1)}
-            <DividerComponent rating />
-        </RowComponent>
-    )).reverse(); // Đảo ngược mảng trước khi render
-
-    return (
-        <View>
-            <TextComponent
-                text='Ratings & Reviews'
-                color={appColors.white}
-                size={17}
-                font='bold'
-            />
-            <RowComponent>
-                <View>
-                    <RowComponent>
-                        <TextComponent
-                            text='8.0'
-                            color={appColors.white}
-                            size={50}
-                            font='bold'
-                        />
-                        <TextComponent
-                            text='/10'
-                            color={appColors.gray6}
-                            size={17}
-                        />
-                    </RowComponent>
-                    <TextComponent
-                        text='3k Ratings'
-                        color={appColors.gray6}
-                        size={13}
-                    />
-                </View>
-                <SpaceComponent width={30} />
-                <View style={{ marginEnd: 0 }}>
-                    {rating}
-                </View>
-            </RowComponent>
-        </View>
-    );
+const appColors = {
+  white: '#FFFFFF',
+  gray: '#A9A9A9',
+  gray6: '#666666',
+  green: '#00C853', // Màu xanh cho nút "Write a review"
 };
 
-export default RatingComponent;
+const ratingData = [
+  { stars: 5, percentage: 80 },
+  { stars: 4, percentage: 10 },
+  { stars: 3, percentage: 5 },
+  { stars: 2, percentage: 3 },
+  { stars: 1, percentage: 2 },
+];
+
+const RatingOverviewComponent = () => {
+  return (
+    <View style={{backgroundColor: '#121212' }}>
+      {/* Tiêu đề */}
+      <Text style={{ color: appColors.white, fontSize: 17, fontWeight: 'bold' }}>
+        Ratings & Reviews
+      </Text>
+
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
+        {/* Điểm số trung bình */}
+        <View style={{ marginRight: 20 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
+            <Text style={{ fontSize: 50, color: appColors.white, fontWeight: 'bold' }}>
+              8.2
+            </Text>
+            <Text style={{ fontSize: 17, color: appColors.gray6 }}> /10</Text>
+          </View>
+          <Text style={{ fontSize: 13, color: appColors.gray6 }}>482 Ratings</Text>
+        </View>
+
+        {/* Bảng tỷ lệ đánh giá */}
+        <View style={{ flex: 1 }}>
+          {ratingData.map(({ stars, percentage }) => (
+            <View key={stars} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
+              {/* Hiển thị số sao từ phải qua trái */}
+              <View style={{ flexDirection: 'row-reverse', width: 80, marginRight: 10 }}>
+                {Array.from({ length: 5 }, (_, i) => (
+                  <AntDesign
+                    key={i}
+                    name={i < stars ? 'star' : 'staro'}
+                    size={12}
+                    color={appColors.gray}
+                  />
+                ))}
+              </View>
+              {/* Thanh progress bar */}
+              <View
+                style={{
+                  height: 6,
+                  flex: 1,
+                  backgroundColor: '#333',
+                  borderRadius: 3,
+                  overflow: 'hidden',
+                  marginRight: 10, // Đẩy progress bar sang trái
+                }}
+              >
+                <View
+                  style={{
+                    width: `${percentage}%`,
+                    height: '100%',
+                    backgroundColor: appColors.gray,
+                  }}
+                />
+              </View>
+            </View>
+          ))}
+        </View>
+      </View>
+
+      {/* Nút "Write a review" */}
+      <TouchableOpacity style={{ marginTop: 10 }}>
+        <Text style={{ color: appColors.green, fontSize: 14, fontWeight: 'bold' }}>
+          + Write a review
+        </Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
+
+export default RatingOverviewComponent;

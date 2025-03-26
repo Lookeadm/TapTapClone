@@ -18,7 +18,6 @@ const ContainerComponent = ({
 
     return isImageBackground ? (
         <ImageBackground
-            source={require('../../assets/images/splash-img.png')}
             style={{ flex: 1 }}
             imageStyle={{flex: 1}}
         >

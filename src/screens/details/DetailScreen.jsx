@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { View, Image, } from 'react-native';
+import { View, Image, ScrollView, } from 'react-native';
 import config from '../../apis/config';
 import { ContainerComponent, DividerComponent, HeaderComponent, RowComponent, SectionComponent, SeparatorComponent, SpaceComponent, TextComponent } from '../../components';
-import { ScreenshotComponent, UserRatingComponent } from './components';
+import { CommentComp, DownloadComponent, RatingComponent, ScreenshotComponent, UserRatingComponent } from './components';
 import { appColors } from '../../constants/appColors';
 import CategoryComponent from '../home/components/CategoriesItem';
-import RatingComponent from './components/RatingComponent';
 
 const apiKey = config.API_KEY;
 const urlGame = config.API_URL;
@@ -13,11 +12,8 @@ const urlGame = config.API_URL;
 const DetailsScreen = ({ route }) => {
     const { game } = route.params;
     const [details, setDetails] = useState([]);
-    const [progress, setProgress] = useState(0);
-    const [isPaused, setIsPaused] = useState(false);
     const gameId = game.id;
     const urlDev = `${urlGame}/${gameId}?key=${apiKey}`;
-    console.log("Game: " + JSON.stringify(urlDev))
     const genres = () => {
         try {
             return game.genres.slice(0, 3).map((genre, index) => (
@@ -81,52 +77,16 @@ const DetailsScreen = ({ route }) => {
         }
     }
 
-    // const handleDownload = async () => {
-    //     const uri = 'https://dw.uptodown.net/dwn/-0nWzQe3EtXCaSnQMxRr3V0-slrfB-m4R8FjbP5Jp2eUX7SvZrXEev2HggrvRe35V8WnNoUXkw5dOFKbmzIDAewS6diX1GQ2aPClDjMzh-pd6rP-sa9KM2OS8A29QPu-/ZCyXPFt4XRNhBnFZdfHdFyWU6-lGLLVcxaFIiAy0x5R3_QZgHMJGu_Yhht7RRhfhuRKNUm5ik5DG59xZ4QHcRWg29XfnJNqTFF3Xtd3jLy3o9Zaa-Z43FERgzvZLEwgp/v-xJ_MFvobTU3PMzpJK1mumbOw5fkH6LuRjG_YnnDSVB0vQ9BFBb2nx9Bd6QRSvjB5elt6y_CUPHh_A3HJdNx8pKNBuoQ7aF0ajcyjO4MPKU-2pIEJQuky7GBVhHSujy/genshin-impact-5-3-0-29183395-29332470.apk';
-
-    //     const fileUri = `${FileSystem.documentDirectory}.apk`;
-
-    //     const callback = (downloadProgress) => {
-    //         const progress =
-    //             downloadProgress.totalBytesExpectedToWrite > 0 ? // Kiểm tra xem tổng số byte có lớn hơn 0 không
-    //                 downloadProgress.totalBytesWritten / downloadProgress.totalBytesExpectedToWrite : 0; // Tính toán tiến trình
-    //         setProgress(progress);
-
-    //     };
-
-    //     try {
-    //         const downloadResumable = FileSystem.createDownloadResumable(uri, fileUri, {}, callback);
-    //         const { uri: downloadedFileUri } = await downloadResumable.downloadAsync();
-    //         alert(`Tệp đã được tải về: ${downloadedFileUri}`);
-    //     } catch (error) {
-    //         console.error(error);
-    //         alert('Tải xuống thất bại!');
-    //     }
-    // };
-
-    // const handlePauseResume = async () => {
-    // if (isPaused) {
-    //     await downloadResumable.resumeAsync();
-    // } else {
-    //     await downloadResumable.pauseAsync();
-    // }
-    // setIsPaused(prev => !prev); // Sử dụng hàm callback để cập nhật trạng thái
-    // };
-
     return (
         <View>
             <HeaderComponent back detail navigation />
-            <View
-                isScroll
-                >
+            <ScrollView>
+            <View>
                 <ScreenshotComponent images={screenshort()} />
                 <SpaceComponent height={15} />
                 <SectionComponent>
                     <RowComponent
-                        styles={{
-                            marginBottom: 10
-                        }}
-                    >
+                        styles={{ marginBottom: 10 }}>
                         <Image source={{ uri: game.background_image }} style={{ width: 70, height: 70, borderRadius: 15 }} />
                         <SpaceComponent width={15} />
                         <View>
@@ -140,11 +100,21 @@ const DetailsScreen = ({ route }) => {
                                     width: '100%'
                                 }}
                             />
-                            <TextComponent
-                                text={genres()}
-                                color={appColors.gray6}
-                                size={12}
-                            />
+                            <RowComponent>
+                                <Image
+                                    source={require('../../../assets/images/Android 1 (1).png')}
+                                    style={{width: 24, height: 24}}
+                                />
+                                <Image
+                                    source={require('../../../assets/images/Apple 1.png')}
+                                    style={{width: 24, height: 24}}
+                                />
+                                <TextComponent
+                                    text={genres()}
+                                    color={appColors.gray6}
+                                    size={12}
+                                />
+                            </RowComponent>
                             <TextComponent
                                 size={12}
                                 text={developer()}
@@ -165,18 +135,18 @@ const DetailsScreen = ({ route }) => {
                 </SectionComponent>
                 <DividerComponent />
 
-                {/* <SectionComponent>
+                <SectionComponent>
                     <DownloadComponent/>
-                </SectionComponent> */}
+                </SectionComponent>
 
                 <SectionComponent>
                     <CategoryComponent detail/>
                 </SectionComponent>
                 <DividerComponent />
 
-                {/* <SectionComponent>
+                <SectionComponent>
                     <RatingComponent/>
-                </SectionComponent> */}
+                </SectionComponent>
 
                 <SectionComponent>
                     <RowComponent justify='space-between'>
@@ -184,10 +154,14 @@ const DetailsScreen = ({ route }) => {
                             text='My Rating'
                             color={appColors.white}
                         />
-                        {/* <UserRatingComponent /> */}
+                        <UserRatingComponent />
                     </RowComponent>
                 </SectionComponent>
+                <SectionComponent>
+                    <CommentComp/>
+                </SectionComponent>
             </View>
+            </ScrollView>
         </View>
     );
 };

@@ -2,39 +2,32 @@ import { View, Text, StyleSheet, Image } from 'react-native';
 import React from 'react';
 import Swiper from 'react-native-swiper';
 import { appColors } from '../../../constants/appColors';
-import { TextComponent } from '../../../components';
+import { RowComponent, TextComponent } from '../../../components';
 
 const SwiperGames = () => {
     const slides = [
         {
             title: "Game of the day",
-            image: require('../../../../assets/images/ImageTest.png'),
-            name: "Delta Force",
+            image: require('../../../../assets/images/banner.png'),
+            name: "Genshin Impact",
             description: "Delta Force launch on January 20, 2025 on mobile. Pre-register now",
         },
         {
             title: "Featured Game",
-            image: require('../../../../assets/images/ImageTest.png'),
-            name: "Call of Duty Mobile",
+            image: require('../../../../assets/images/banner2.jpg'),
+            name: "Zenless Zone Zero",
             description: "Experience the thrill of battle on mobile now!",
         },
         {
             title: "Top Action Game",
-            image: require('../../../../assets/images/ImageTest.png'),
-            name: "PUBG Mobile",
+            image: require('../../../../assets/images/banner3.jpg'),
+            name: "Honkai Star Rail",
             description: "Jump into the action and become the last one standing!",
         },
     ];
 
     return (
-        <View
-            style={{
-                height: 320,
-                backgroundColor: appColors.gray7,
-                borderRadius: 10,
-                padding: 10
-            }}
-        >
+        <View style={styles.slide}>
             <Swiper
                 showsPagination={true}
                 loop={true}
@@ -44,12 +37,20 @@ const SwiperGames = () => {
                 paginationStyle={styles.pagination}
             >
                 {slides.map((slide, index) => (
-                    <View style={styles.slide} key={index}>
-                        <TextComponent text={slide.title} color={appColors.white}/>
+                    <View key={index}>
+                        {/* <TextComponent styles={styles.title} text={slide.title} color={appColors.white} fontWeight={'bold'} /> */}
                         <Image source={slide.image} style={styles.image} />
-                        <TextComponent text={slide.name} color={appColors.white}/>
-                        <TextComponent text={slide.description} color={appColors.white}/>
-                    </View>                   
+                        <View style={{paddingHorizontal: 10}}> 
+                        <RowComponent justify={'space-between'}>
+                            <TextComponent text={slide.name} color={appColors.white} fontWeight={'bold'}/>
+                            <View style={styles.score}>
+                                <TextComponent text={"Score"} color={appColors.green} fontWeight={'bold'}/>
+                                <TextComponent text={"8.6"} color={appColors.green} fontWeight={'bold'}/>
+                            </View>
+                        </RowComponent>
+                        <TextComponent text={slide.description} color={appColors.white} />
+                        </View>
+                    </View>
                 ))}
             </Swiper>
         </View>
@@ -61,16 +62,15 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         overflow: 'hidden',
         width: '100%',
-        height: 302,
-        backgroundColor: appColors.gray,
-        borderRadius: 10,
+        height: 300,
+        backgroundColor: appColors.gray7,
+        borderRadius: 5,
     },
     image: {
         width: '100%',
-        height: 181,
-        borderRadius: 10,
+        height: 190,
+        borderTopLeftRadius: 5,
         resizeMode: 'cover',
-        marginVertical: 10,
     },
     dot: {
         backgroundColor: '#A3A3A3',
@@ -89,6 +89,12 @@ const styles = StyleSheet.create({
     pagination: {
         bottom: 10,
     },
+    title: {
+        position: 'absolute'
+    },
+    score: {
+        alignItems: 'center'
+    }
 });
 
 export default SwiperGames;

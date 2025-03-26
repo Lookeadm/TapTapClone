@@ -39,7 +39,7 @@ const TextComponent = ({
                 flex: flex ?? 0,
                 fontSize: getFontSize(),
                 fontFamily: getFontFamily(),
-                fontWeight: getFontFamily(),
+                fontWeight: fontWeight,
             },
             styles,
         ]}

@@ -9,34 +9,20 @@ const AppItemComponent = ({
 }) => {
   return (
     <>
-    <View>
+    <View style={{marginRight: 5}}>
       <SectionComponent 
-        styles={{
-            width: 90
-        }}
+        styles={{width: 80}}
       >
-        <Image source={{ uri: image }} style={{ width: 80, height:80, borderRadius: 15 }} />
+        <Image source={{ uri: image }} style={{ width: 70, height: 70, borderRadius: 15 }} />
         <TextComponent
             size={14}
             text={title}
             color={appColors.white}
             styles={{
-              height: 50,
               overflow: 'hidden',
-              width: 80
+              width: 70
             }}
             numberOfLines={2}
-        />
-        <ButtonComponent
-            styles={{
-                width: 80,
-                height: 30,
-                borderWidth: 1
-            }}
-            text="Download"
-            textColor={appColors.green}
-            borderColor={appColors.green}
-            border
         />
       </SectionComponent>
       

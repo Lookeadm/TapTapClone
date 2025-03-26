@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, FlatList } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import config from '../../apis/config'
 import { useDispatch } from 'react-redux';
 import { AppItem, Categories, CategoriesItem, Search } from './components';
@@ -10,14 +10,21 @@ import { appColors } from '../../constants/appColors';
 import PagerView from 'react-native-pager-view';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faBell } from '@fortawesome/free-solid-svg-icons';
+import Animated, {useSharedValue, withTiming, useAnimatedScrollHandler, useAnimatedStyle, interpolate, Extrapolate, useDerivedValue} from 'react-native-reanimated'
 
 var apiKey = config.API_KEY;
 var url = config.API_URL;
 
-const HomeScreen = ({navigation}) => {
+const CATEGORY_MAX_HEIGHT = 50;
+const CATEGORY_MIN_HEIGHT = 5;
+const CATEGORY_MAX_SCALE = 1;
+const CATEGORY_MIN_SCALE = 0;
+
+const HomeScreen = ({ navigation }) => {
     const [games, setGames] = useState([]);
-    const dispatch = useDispatch();
-    const [selectedIndex, setSelectedIndex] = useState(0)
+    const [selectedIndex, setSelectedIndex] = useState(0);
+    const scrollY = useSharedValue(0);
+
     useEffect(() => {
         fetch(`${url}?key=${apiKey}&page_size=20&platforms=3&`)
             .then(response => {
@@ -50,31 +57,28 @@ const HomeScreen = ({navigation}) => {
             return (
                 <View>
                     <SectionComponent>
-                        <SwiperGames/>
+                        <SwiperGames />
                     </SectionComponent>
                 </View>
             );
         }
         if (index % 4 === 3) {
-            const horizontalGames = games.slice(index, index + 4); // Lấy 4 game tiếp theo
+            const horizontalGames = games.slice(index, index + 5); // Lấy 4 game tiếp theo
             return (
-                <>
-                    <View>
-                        <Categories/>
-                        <FlatList
-                            data={horizontalGames}
-                            keyExtractor={(game) => game.id.toString()}
-                            renderItem={renderHorizontalGames}
-                            horizontal
-                            showsHorizontalScrollIndicator={false}
-                            contentContainerStyle={{
-                                flexDirection: 'row',
-                                gap: 3,
-                            }}
-                        />
-                        <DividerComponent />
-                    </View>
-                </>
+                <View>
+                    <Categories />
+                    <FlatList
+                        data={horizontalGames}
+                        keyExtractor={(game) => game.id.toString()}
+                        renderItem={renderHorizontalGames}
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        contentContainerStyle={{
+                            flexDirection: 'row',
+                        }}
+                    />
+                    <DividerComponent />
+                </View>
             );
         }
 
@@ -94,10 +98,9 @@ const HomeScreen = ({navigation}) => {
                                 color={appColors.gray6}
                                 size={12}
                             />
-                            {index < item.genres.slice(0, 3).length - 1 && <SeparatorComponent/>}
+                            {index < item.genres.slice(0, 3).length - 1 && <SeparatorComponent />}
                         </View>
                     ))}
-                // genres = {item.genres.slice(0, 3).map(genre=> genre.name).join(' • ')}
                 />
             </TouchableOpacity>
         );
@@ -124,16 +127,55 @@ const HomeScreen = ({navigation}) => {
                             {index < item.genres.slice(0, 2).length - 1 && <SeparatorComponent />}
                         </View>
                     ))}
-                // genres = {item.genres.slice(0, 3).map(genre=> genre.name).join(' • ')}
                 />
             </TouchableOpacity>
         );
     }
 
+    const derivedScrollY = useDerivedValue(() => 
+        interpolate(
+            scrollY.value,
+            [0, CATEGORY_MAX_HEIGHT - CATEGORY_MIN_HEIGHT],
+            [CATEGORY_MAX_HEIGHT, CATEGORY_MIN_HEIGHT],
+            Extrapolate.CLAMP
+        )
+    );
+    const scrollHandler = useAnimatedScrollHandler(event => {
+        scrollY.value = event.contentOffset.y;
+      });
+    const heightStyle = useAnimatedStyle(()=>{
+        return {
+            height: derivedScrollY.value,
+            opacity: interpolate(
+                scrollY.value,
+                [0, CATEGORY_MAX_HEIGHT - CATEGORY_MIN_HEIGHT],
+                [1, 0],
+                Extrapolate.CLAMP
+              ),
+              
+    }});
+
+    const itemStyle = useAnimatedStyle(() => {
+        return {
+          scale: interpolate(
+            scrollY.value,
+            [0, CATEGORY_MAX_HEIGHT - CATEGORY_MIN_HEIGHT],
+            [CATEGORY_MAX_SCALE, CATEGORY_MIN_SCALE],
+            Extrapolate.CLAMP
+          ),
+          opacity: interpolate(
+            scrollY.value,
+            [0, CATEGORY_MAX_HEIGHT - CATEGORY_MIN_HEIGHT],
+            [1, 0.1],
+            Extrapolate.CLAMP
+          ),
+        };
+      });
+
     const renderPage = (type) => {
         const renderItem = type === 'topChart' ? renderTopChart : renderGame;
         return (
-            <FlatList
+            <Animated.FlatList
                 data={games}
                 keyExtractor={(item) => item.id.toString()}
                 renderItem={renderItem}
@@ -141,12 +183,13 @@ const HomeScreen = ({navigation}) => {
                 ListEmptyComponent={
                     <Text>No games available at the moment.</Text>
                 }
+                onScroll={scrollHandler}
+                scrollEventThrottle={16}
             />
         );
     };
-
     const handlePageChange = (event) => {
-        setSelectedIndex(event.nativeEvent.position); // Cập nhật trang hiện tại
+        setSelectedIndex(event.nativeEvent.position);
     };
 
     return (
@@ -154,17 +197,18 @@ const HomeScreen = ({navigation}) => {
             <SectionComponent>
                 <SpaceComponent height={40} />
                 <RowComponent justify="space-between">
-                    <TouchableOpacity onPress={()=>navigation.navigate('Search')}>
+                    <TouchableOpacity onPress={() => navigation.navigate('Search')}>
                         <Search home />
                     </TouchableOpacity>
-                    <FontAwesomeIcon icon={faBell} size={24} color={appColors.white}/>
+                    <FontAwesomeIcon icon={faBell} size={24} color={appColors.white} />
                 </RowComponent>
             </SectionComponent>
-
             <DividerComponent />
 
             <SectionComponent>
-                <CategoriesItem index={selectedIndex}/>
+                <Animated.View style={heightStyle}>
+                    <CategoriesItem index={selectedIndex}/>
+                </Animated.View>
             </SectionComponent>
 
             <View style={{}}>

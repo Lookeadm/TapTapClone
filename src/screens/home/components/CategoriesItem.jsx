@@ -7,7 +7,9 @@ import { appColors } from '../../../constants/appColors';
 
 const CategoryComponent = ({
     index,
-    detail
+    detail,
+    styles,
+    change
 }) => {
     const categories = [
         { iconName: faGamepad, categoryName: "Genres" },
@@ -40,14 +42,18 @@ const CategoryComponent = ({
                         alignItems: 'center',
                         justifyContent: 'center'
                     }}
-                >
-                    <FontAwesomeIcon
-                        icon={iconName}
-                        size={34}
-                        style={{
-                            color: selectedIndex == index ? appColors.green : appColors.white
-                        }}
-                    />
+                >{
+                        change ? (
+                            <View></View>
+                        ) : (
+                            <FontAwesomeIcon
+                                icon={iconName}
+                                size={34}
+                                style={{
+                                    color: selectedIndex == index ? appColors.green : appColors.white
+                                }}
+                            />)
+                    }
                     <TextComponent
                         text={categoryName}
                         size={14}
@@ -92,13 +98,13 @@ const CategoryComponent = ({
     })
 
     return detail ? (
-        <View style={{width: '60%'}}>
+        <View style={[{ width: '60%' }, styles]}>
             <RowComponent justify="space-between">
                 {renderItem()}
             </RowComponent>
         </View>
     ) : (
-        <View>
+        <View style={styles}>
             <RowComponent justify="space-between">
                 {renderCategory()}
             </RowComponent>
