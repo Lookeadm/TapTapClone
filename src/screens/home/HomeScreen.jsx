@@ -11,6 +11,7 @@ import PagerView from 'react-native-pager-view';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faBell } from '@fortawesome/free-solid-svg-icons';
 import Animated, {useSharedValue, withTiming, useAnimatedScrollHandler, useAnimatedStyle, interpolate, Extrapolate, useDerivedValue} from 'react-native-reanimated'
+import AxiosInstance from '../../apis/AxiosInstance';
 
 var apiKey = config.API_KEY;
 var url = config.API_URL;
@@ -23,35 +24,37 @@ const CATEGORY_MIN_SCALE = 0;
 const HomeScreen = ({ navigation }) => {
     const [games, setGames] = useState([]);
     const [selectedIndex, setSelectedIndex] = useState(0);
+    const [isLoading, setIsLoading] = useState(false);
     const scrollY = useSharedValue(0);
 
     useEffect(() => {
-        fetch(`${url}?key=${apiKey}&page_size=20&platforms=3&`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                setGames(data.results) // In ra dữ liệu JSON
-            })
-            .catch(error => {
-                console.error('There was a problem with the fetch operation:', error);
-            });
-
+        const fetchGames = async() => {
+            setIsLoading(true);
+            try{
+                const games = await AxiosInstance().get("/games/all");
+                setGames(games.data);
+            }catch(e){
+                console.log("Lấy game thất bại", e);
+            }
+            finally{
+                setIsLoading(false);
+            }
+        }
+        fetchGames();
     }, []);
+
     const renderHorizontalGames = ({ item }) => (
         <TouchableOpacity
-            onPress={() => navigation.navigate('Details', { game: item })}
+            onPress={() => navigation.navigate('Details', { id: item._id })}
             activeOpacity={1}
         >
             <AppItem
                 title={item.name}
-                image={item.background_image}
+                image={item.avatar}
             />
         </TouchableOpacity>
     );
+
     const renderGame = ({ item, index }) => {
         if (index === 0) {
             return (
@@ -69,7 +72,7 @@ const HomeScreen = ({ navigation }) => {
                     <Categories />
                     <FlatList
                         data={horizontalGames}
-                        keyExtractor={(game) => game.id.toString()}
+                        keyExtractor={(game) => game._id.toString()}
                         renderItem={renderHorizontalGames}
                         horizontal
                         showsHorizontalScrollIndicator={false}
@@ -84,23 +87,16 @@ const HomeScreen = ({ navigation }) => {
 
         return (
             <TouchableOpacity
-                onPress={() => navigation.navigate('Details', { game: item })}
+                onPress={() => navigation.navigate('Details', { id: item._id })}
                 activeOpacity={1}
             >
                 <CardGames
                     title={item.name}
-                    image={item.background_image}
-                    rating={item.rating}
-                    genres={item.genres.slice(0, 3).map((genre, index) => (
-                        <View key={index} style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <TextComponent
-                                text={genre.name}
-                                color={appColors.gray6}
-                                size={12}
-                            />
-                            {index < item.genres.slice(0, 3).length - 1 && <SeparatorComponent />}
-                        </View>
-                    ))}
+                    image={item.avatar}
+                    background={item.background}
+                    rating={item.averageRating}
+                    description={item.description}
+                    genres={item.categories}
                 />
             </TouchableOpacity>
         );
@@ -108,29 +104,49 @@ const HomeScreen = ({ navigation }) => {
     const renderTopChart = ({ item, index }) => {
         return (
             <TouchableOpacity
-                onPress={() => navigation.navigate('Details', { game: item })}
+                onPress={() => navigation.navigate('Details', { id: item._id })}
                 activeOpacity={1}
             >
                 <CardGames
                     topChart
                     number={index + 1}
                     title={item.name}
-                    image={item.background_image}
-                    rating={item.rating}
-                    genres={item.genres.slice(0, 2).map((genre, index) => (
+                    image={item.avatar}
+                    rating={item.averageRating}
+                    genres={item.categories.slice(0, 2).map((genre, index) => (
                         <View key={index} style={{ flexDirection: 'row', alignItems: 'center' }}>
                             <TextComponent
                                 text={genre.name}
                                 color={appColors.gray6}
                                 size={12}
                             />
-                            {index < item.genres.slice(0, 2).length - 1 && <SeparatorComponent />}
+                            {index < item.categories.slice(0, 2).length - 1 && <SeparatorComponent />}
                         </View>
                     ))}
                 />
             </TouchableOpacity>
         );
     }
+
+    const renderPage = (type) => {
+        const renderItem = type === 'topChart' ? renderTopChart : renderGame;
+        return (
+            <Animated.FlatList
+                data={games}
+                keyExtractor={(item) => item._id.toString()}
+                renderItem={renderItem}
+                showsVerticalScrollIndicator={false}
+                ListEmptyComponent={
+                    <Text>No games available at the moment.</Text>
+                }
+                onScroll={scrollHandler}
+                scrollEventThrottle={16}
+            />
+        );
+    };
+    const handlePageChange = (event) => {
+        setSelectedIndex(event.nativeEvent.position);
+    };
 
     const derivedScrollY = useDerivedValue(() => 
         interpolate(
@@ -154,43 +170,6 @@ const HomeScreen = ({ navigation }) => {
               ),
               
     }});
-
-    const itemStyle = useAnimatedStyle(() => {
-        return {
-          scale: interpolate(
-            scrollY.value,
-            [0, CATEGORY_MAX_HEIGHT - CATEGORY_MIN_HEIGHT],
-            [CATEGORY_MAX_SCALE, CATEGORY_MIN_SCALE],
-            Extrapolate.CLAMP
-          ),
-          opacity: interpolate(
-            scrollY.value,
-            [0, CATEGORY_MAX_HEIGHT - CATEGORY_MIN_HEIGHT],
-            [1, 0.1],
-            Extrapolate.CLAMP
-          ),
-        };
-      });
-
-    const renderPage = (type) => {
-        const renderItem = type === 'topChart' ? renderTopChart : renderGame;
-        return (
-            <Animated.FlatList
-                data={games}
-                keyExtractor={(item) => item.id.toString()}
-                renderItem={renderItem}
-                showsVerticalScrollIndicator={false}
-                ListEmptyComponent={
-                    <Text>No games available at the moment.</Text>
-                }
-                onScroll={scrollHandler}
-                scrollEventThrottle={16}
-            />
-        );
-    };
-    const handlePageChange = (event) => {
-        setSelectedIndex(event.nativeEvent.position);
-    };
 
     return (
         <View>

@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import AxiosInstance from '../../../apis/AxiosInstance';
 
 const appColors = {
   white: '#FFFFFF',
@@ -9,15 +10,37 @@ const appColors = {
   green: '#00C853', // Màu xanh cho nút "Write a review"
 };
 
-const ratingData = [
-  { stars: 5, percentage: 80 },
-  { stars: 4, percentage: 10 },
-  { stars: 3, percentage: 5 },
-  { stars: 2, percentage: 3 },
-  { stars: 1, percentage: 2 },
-];
+const RatingOverviewComponent = ({
+  gameId,
+  rating
+}) => {
+  const [reviews, setReviews] = useState([]);
 
-const RatingOverviewComponent = () => {
+  useEffect(()=>{
+    const fetchReviews = async () => {
+      try {
+        const response = await AxiosInstance().get(`/previewGame/${gameId}`);
+        setReviews(response.data);
+      } catch (error) {
+        console.error("Error fetching reviews:", error);
+      }
+    };
+    fetchReviews();
+  }, [gameId]);
+
+  const ratingCounts = reviews.reduce((acc, review) => {
+    acc[review.rating] = (acc[review.rating] || 0) + 1;
+    return acc;
+  }, {});
+
+  const totalReviews = reviews.length;
+
+  const ratingPercentage = Object.entries(ratingCounts).map(([rating, count]) => ({
+    rating: Number(rating),
+    percentage: ((count / totalReviews) * 100).toFixed(0)
+  }));
+  console.log(reviews);
+  
   return (
     <View style={{backgroundColor: '#121212' }}>
       {/* Tiêu đề */}
@@ -30,25 +53,25 @@ const RatingOverviewComponent = () => {
         <View style={{ marginRight: 20 }}>
           <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
             <Text style={{ fontSize: 50, color: appColors.white, fontWeight: 'bold' }}>
-              8.2
+              {rating}
             </Text>
-            <Text style={{ fontSize: 17, color: appColors.gray6 }}> /10</Text>
+            <Text style={{ fontSize: 17, color: appColors.gray6 }}> /5</Text>
           </View>
-          <Text style={{ fontSize: 13, color: appColors.gray6 }}>482 Ratings</Text>
+          <Text style={{ fontSize: 13, color: appColors.gray6 }}>{totalReviews} Ratings</Text>
         </View>
 
         {/* Bảng tỷ lệ đánh giá */}
         <View style={{ flex: 1 }}>
-          {ratingData.map(({ stars, percentage }) => (
-            <View key={stars} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
+          {ratingPercentage.map(({ rating, percentage }) => (
+            <View key={rating} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
               {/* Hiển thị số sao từ phải qua trái */}
-              <View style={{ flexDirection: 'row-reverse', width: 80, marginRight: 10 }}>
+              <View style={{ flexDirection: 'row-reverse', width: 80, marginRight: 5 }}>
                 {Array.from({ length: 5 }, (_, i) => (
                   <AntDesign
                     key={i}
-                    name={i < stars ? 'star' : 'staro'}
-                    size={12}
-                    color={appColors.gray}
+                    name={i < rating ? 'star' : ''}
+                    size={11}
+                    color={appColors.gray6}
                   />
                 ))}
               </View>

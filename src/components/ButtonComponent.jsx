@@ -90,20 +90,4 @@ const ButtonComponent = ({
 
 }
 
-ButtonComponent.propTypes = {
-    icon: PropTypes.element, // Kiểu dữ liệu là React Node
-    text: PropTypes.string.isRequired, // Bắt buộc là chuỗi
-    type: PropTypes.oneOf(['primary', 'text', 'link']), // Giá trị chỉ có thể là 'primary', 'text', hoặc 'link'
-    color: PropTypes.string, // Màu dạng chuỗi
-    styles: PropTypes.object, // Kiểu dáng cho View (StyleProp không sử dụng được trong prop-types)
-    textColor: PropTypes.string, // Màu văn bản dạng chuỗi
-    textStyles: PropTypes.object, // Kiểu dáng cho Text
-    textFont: PropTypes.string, // Phông chữ dạng chuỗi
-    onPress: PropTypes.func, // Hàm được gọi khi nhấn
-    iconFlex: PropTypes.oneOf(['right', 'left']), // Chỉ nhận giá trị 'right' hoặc 'left'
-    disable: PropTypes.bool,
-    borderColor: PropTypes.string,
-    border: PropTypes.bool
-}
-
 export default ButtonComponent

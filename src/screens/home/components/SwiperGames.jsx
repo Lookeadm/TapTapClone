@@ -64,12 +64,13 @@ const styles = StyleSheet.create({
         width: '100%',
         height: 300,
         backgroundColor: appColors.gray7,
-        borderRadius: 5,
+        borderRadius: 10,
     },
     image: {
         width: '100%',
-        height: 190,
-        borderTopLeftRadius: 5,
+        height: 200,
+        borderTopLeftRadius: 10,
+        borderTopRightRadius: 10,
         resizeMode: 'cover',
     },
     dot: {
@@ -93,6 +94,7 @@ const styles = StyleSheet.create({
         position: 'absolute'
     },
     score: {
+        marginTop: 5,
         alignItems: 'center'
     }
 });

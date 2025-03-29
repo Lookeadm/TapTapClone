@@ -8,6 +8,7 @@ import AuthNavigation from './AuthNavigation';
 import SplashScreen from '../screens/auth/SplashScreen';
 
 const AppRouters = () => {
+
     const [isShowSplash, setIsShowSplash] = useState(true);
     const { getItem } = useAsyncStorage('auth');
     const auth = useSelector(authSelector);

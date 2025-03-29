@@ -1,8 +1,10 @@
 import { View, Text, TouchableOpacity, Image } from 'react-native'
 import React from 'react'
-import { ButtonComponent, DividerComponent, RowComponent, SectionComponent, SpaceComponent, TextComponent } from '../../../components'
+import { ButtonComponent, DividerComponent, RowComponent, SectionComponent, SeparatorComponent, SpaceComponent, TextComponent } from '../../../components'
 import { fontFamilies } from '../../../constants/fontFamilies'
 import { appColors } from '../../../constants/appColors'
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 
 const CardGames = ({
   title,
@@ -12,14 +14,30 @@ const CardGames = ({
   flatform,
   video,
   topChart,
-  number
+  number,
+  background,
+  description
 }) => {
+
+  const categories = () => {
+    genres.slice(0, 3).map((genre, index) => (
+      <View key={index} style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <TextComponent
+          text={genre.name}
+          color={appColors.gray6}
+          size={12}
+        />
+        {index < item.categories.slice(0, 3).length - 1 && <SeparatorComponent />}
+      </View>
+    ))
+  }
+
   return topChart ? (
     <View>
       <SectionComponent>
         <RowComponent justify={'space-between'}>
-          <TextComponent 
-            text={number} 
+          <TextComponent
+            text={number}
             font={fontFamilies.bold}
             color={appColors.white}
           />
@@ -36,7 +54,7 @@ const CardGames = ({
               }}
             />
             <RowComponent>
-              {/* <AntDesign name="star" size={12} color={appColors.gray6} style={{ marginRight: 4 }} /> */}
+              <AntDesign name="star" size={12} color={appColors.gray6} style={{ marginRight: 4 }} />
               <TextComponent
                 text={rating}
                 color={appColors.gray6}
@@ -52,14 +70,14 @@ const CardGames = ({
             />
           </View>
           <ButtonComponent
-              text="Download"
-              textColor={appColors.green}
-              borderColor={appColors.green}
-              border
-            />
+            text="Download"
+            textColor={appColors.green}
+            borderColor={appColors.green}
+            border
+          />
         </RowComponent>
       </SectionComponent>
-      <DividerComponent/>
+      <DividerComponent />
     </View>
   ) : (
     <>
@@ -81,19 +99,26 @@ const CardGames = ({
                   }}
                 />
                 <RowComponent>
-                  {/* <AntDesign name="star" size={12} color={appColors.gray6} style={{ marginRight: 4 }} /> */}
+                  <AntDesign name="star" size={11} color={appColors.gray6} />
                   <TextComponent
                     text={rating}
                     color={appColors.gray6}
                     size={12}
                     styles={{ marginHorizontal: 4 }}
                   />
-                  <TextComponent
-                    text={genres}
-                    color={appColors.gray6}
-                    size={12}
-                    styles={{ marginHorizontal: 4 }}
-                  />
+                  {genres.slice(0, 3).map((genre, index) => (
+                    <View key={index} style={{ flexDirection: 'row', alignItems: 'center' }}>
+                      <SeparatorComponent />
+                      <TextComponent
+                        text={genre.name}
+                        color={appColors.gray6}
+                        size={12}
+                      />
+                    </View>
+                  ))}
+                  <SeparatorComponent />
+                  <FontAwesome name="apple" size={12} color={appColors.gray6} style={{ marginRight: 5 }} />
+                  <FontAwesome name="android" size={12} color={appColors.gray6} style={{ marginRight: 5 }} />
                 </RowComponent>
               </View>
             </RowComponent>
@@ -105,12 +130,13 @@ const CardGames = ({
             />
           </RowComponent>
         </SectionComponent>
-        <Image source={{ uri: image }} style={{ width: '100%', height: 200 }} />
+        <Image source={{ uri: background }} style={{ width: '100%', height: 250 }} />
         <SpaceComponent height={10} />
         <SectionComponent>
           <TextComponent
-            text="Grand Cross: Age of Titans creates a colorfulworld with fully-voiced characters, an engaging narrative and the unique joy of castle-building."
+            text={description}
             color={appColors.white}
+            numberOfLines={2}
           />
         </SectionComponent>
         <DividerComponent />

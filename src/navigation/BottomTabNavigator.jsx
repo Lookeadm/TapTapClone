@@ -6,6 +6,7 @@ import DetailsScreen from '../screens/details/DetailScreen';
 import SearchHistory from '../screens/search/components/SearchHistory';
 import SearchScreen from '../screens/search/SearchScreen';
 import ProfileScreen from '../screens/profile/ProfileScreen';
+import ReviewScreen from '../screens/details/ReviewScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -18,9 +19,10 @@ const HomeStack = () => (
       }}
     >
     <Stack.Screen name="Home" component={HomeScreen}/>
-    <Stack.Screen name="Details" component={DetailsScreen}/>
+    <Stack.Screen name="Details" component={DetailsScreen} />
     <Stack.Screen name="Search" component={SearchScreen}/>
     <Stack.Screen name="Profile" component={ProfileScreen}/>
+    <Stack.Screen name="Review" component={ReviewScreen}/>
   </Stack.Navigator>
 );
 

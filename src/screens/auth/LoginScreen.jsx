@@ -34,11 +34,6 @@ const LoginScreen = ({ navigation }) => {
         if (emailValidation) {
             setIsLoading(true);
             try {
-                // const body = {
-                //     email: email,
-                //     password: password
-                // }
-                // const res = await AxiosInstance().post("/users/login", body);
                 const res = await authenticationAPI.HandleAuthentication(
                   '/login', 
                   {email, password},
