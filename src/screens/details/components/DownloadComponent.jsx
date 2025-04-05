@@ -1,6 +1,6 @@
-import { 
-    StyleSheet, Text, View, PermissionsAndroid, Platform, 
-    Button, ActivityIndicator, Alert, Linking, TouchableOpacity, 
+import {
+    StyleSheet, Text, View, PermissionsAndroid, Platform,
+    Button, ActivityIndicator, Alert, Linking, TouchableOpacity,
     Pressable
 } from 'react-native';
 import React, { useState } from 'react';
@@ -17,73 +17,20 @@ const DownloadComponent = () => {
     const [downloadedFilePath, setDownloadedFilePath] = useState(null);
 
     const url = 'https://static-sg.winudf.com/xy/aprojectadmin/apkpure_3204127_1109.apk?utm_content=1109';
-    const path = `${RNBlobUtil.fs.dirs.DownloadDir}/app.apk`;
+    const path = `${RNBlobUtil.fs.dirs.LegacyDownloadDir}/TapTap/app.apk`;
 
-    
-const requestPermissions = async () => {
-    if (Platform.OS === 'android') {
-        try {
-            const storageGranted = await PermissionsAndroid.request(
-                PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-                {
-                    title: "Cấp quyền lưu trữ",
-                    message: "Ứng dụng cần quyền lưu trữ để tải file.",
-                    buttonNeutral: "Hỏi lại sau",
-                    buttonNegative: "Từ chối",
-                    buttonPositive: "Đồng ý"
-                }
-            );
-
-            const installGranted = await PermissionsAndroid.request(
-                PermissionsAndroid.PERMISSIONS.REQUEST_INSTALL_PACKAGES,
-                {
-                    title: "Cấp quyền cài đặt",
-                    message: "Ứng dụng cần quyền cài đặt file APK.",
-                    buttonNeutral: "Hỏi lại sau",
-                    buttonNegative: "Từ chối",
-                    buttonPositive: "Đồng ý"
-                }
-            );
-
-            if (storageGranted !== PermissionsAndroid.RESULTS.GRANTED) {
-                showPermissionAlert("Cấp quyền lưu trữ bị từ chối");
-            }
-
-            if (installGranted !== PermissionsAndroid.RESULTS.GRANTED) {
-                showPermissionAlert("Cấp quyền cài đặt bị từ chối");
-            }
-        } catch (err) {
-            console.warn(err);
-        }
-    }
-};
-
-const showPermissionAlert = (message) => {
-    Alert.alert(
-        "Yêu cầu quyền",
-        message + " Bạn có thể cấp quyền trong Cài đặt.",
-        [
-            { text: "Hủy", style: "cancel" },
-            { text: "Mở Cài đặt", onPress: () => Linking.openSettings() }
-        ]
-    );
-};
-
-// Gọi hàm khi ứng dụng chạy
-requestPermissions();
-
-    const requestStoragePermission = async () =>{
-        if(Platform.OS === 'android'){
-            if(Platform.Version>=33){
+    const requestStoragePermission = async () => {
+        if (Platform.OS === 'android') {
+            if (Platform.Version >= 33) {
                 // Android 13+ cần quyền READ_MEDIA_FILES nếu lưu vào thư mục công khai
                 const granted = await PermissionsAndroid.request(
                     PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES
                 );
                 return granted === PermissionsAndroid.RESULTS.GRANTED;
             }
-            else if(Platform.Version >= 29){
+            else if (Platform.Version >= 29) {
                 return true
-            }else{
+            } else {
                 const granted = await PermissionsAndroid.request(
                     PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
                 );
@@ -132,20 +79,28 @@ requestPermissions();
     const requestInstallPermission = async () => {
         if (Platform.OS === 'android' && Platform.Version >= 26) {
             try {
+                // Kiểm tra xem quyền đã được cấp chưa
                 const granted = await PermissionsAndroid.check("android.permission.REQUEST_INSTALL_PACKAGES");
 
                 if (!granted) {
-                    const requestResult = await PermissionsAndroid.request("android.permission.REQUEST_INSTALL_PACKAGES");
+                    // Nếu chưa, yêu cầu quyền
+                    const requestResult = await PermissionsAndroid.request("android.permission.REQUEST_INSTALL_PACKAGES", {
+                        title: "Cấp quyền cài đặt",
+                        message: "Ứng dụng cần quyền cài đặt để cài đặt tệp APK.",
+                        buttonNeutral: "Hỏi lại sau",
+                        buttonNegative: "Từ chối",
+                        buttonPositive: "Đồng ý"
+                    });
 
                     return requestResult === PermissionsAndroid.RESULTS.GRANTED;
                 }
-                return true;
+                return true; // Quyền đã được cấp
             } catch (error) {
                 console.log("Lỗi cấp quyền cài đặt:", error);
-                return false;
+                return false; // Xảy ra lỗi
             }
         }
-        return true;
+        return true; // Không cần yêu cầu quyền trên các phiên bản Android cũ hơn
     };
 
     const pauseDownload = () => {
@@ -166,11 +121,18 @@ requestPermissions();
         if (Platform.OS === 'android') {
             try {
                 const canInstall = await requestInstallPermission();
-                if(!canInstall){
-                    Alert.alert('Quyền bị từ chối', 'Không thể cài đặt ứng dụng.');
+                if (!canInstall) {
+                    Alert.alert(
+                        'Quyền bị từ chối',
+                        'Không thể cài đặt ứng dụng. Vui lòng cấp quyền cài đặt trong Cài đặt.',
+                        [
+                            { text: "Hủy", style: "cancel" },
+                            { text: "Mở Cài đặt", onPress: () => Linking.openSettings() }
+                        ]
+                    );
                     return;
                 }
-
+    
                 const intent = {
                     action: 'android.intent.action.VIEW',
                     data: `file://${filePath}`,
@@ -187,25 +149,26 @@ requestPermissions();
         }
     };
 
+    console.log("Downloaded path: ", path);
     return (
         <View style={styles.container}>
             {isDownloading ? (
                 <Pressable onPress={paused ? resumeDownload : pauseDownload}>
-                    <Progress.Bar 
-                        progress={downloadProgress} 
-                        color={appColors.green} 
+                    <Progress.Bar
+                        progress={downloadProgress}
+                        color={appColors.green}
                         height={36}
                         width={360}
                         borderRadius={10}
                         unfilledColor={appColors.gray}    // Màu nền xám nhạt
                         borderWidth={0}         // Ẩn viền
                         borderColor="transparent"
-                        />
+                    />
                     <Text style={styles.text}>{Math.round(downloadProgress * 100)}%</Text>
                 </Pressable>
             ) : (
                 <ButtonComponent
-                    text= {downloadedFilePath ? "Install" : "Download"}
+                    text={downloadedFilePath ? "Install" : "Download"}
                     textColor={appColors.black}
                     textWeigth='bold'
                     borderColor={appColors.green}
@@ -220,19 +183,19 @@ requestPermissions();
                 />
             )}
             <ButtonComponent
-                    text="Also available"
-                    textColor={appColors.white}
-                    textWeigth='bold'
-                    borderColor={appColors.gray}
-                    color={appColors.gray7}
-                    border
-                    textFont={'bold'}
-                    styles={{
-                        width: '100%',
-                        borderRadius: 10,
-                        marginTop: 10
-                    }}
-                />
+                text="Also available"
+                textColor={appColors.white}
+                textWeigth='bold'
+                borderColor={appColors.gray}
+                color={appColors.gray7}
+                border
+                textFont={'bold'}
+                styles={{
+                    width: '100%',
+                    borderRadius: 10,
+                    marginTop: 10
+                }}
+            />
         </View>
     );
 };

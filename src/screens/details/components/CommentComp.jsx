@@ -10,6 +10,22 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 const CommentSection = ({ gameId }) => {
   const [reviews, setReviews] = useState([]);
+  const [messages, setMessages] = useState([]);
+  const socket = io(appInfo.BASE_URL);
+
+  useEffect(() => {
+    // Lắng nghe sự kiện 'newPost'
+    socket.on('newPost', (data) => {
+        console.log(data.message); // In ra thông báo
+        setMessages(prevMessages => [...prevMessages, data.post]); // Cập nhật danh sách bài post mới
+    });
+
+    // Dọn dẹp khi component bị hủy
+    return () => {
+        socket.off('newPost'); // Ngừng lắng nghe sự kiện khi component bị hủy
+    };
+}, []);
+console.log(messages);
 
   useEffect(() => {
     fetchReviews();

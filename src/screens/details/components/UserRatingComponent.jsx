@@ -14,6 +14,8 @@ const UserRatingComponent = ({
 
   const handleRating = (value) => {
     setRating(value);
+
+    
     if (onChangeRating) {
       onChangeRating(value); // Gửi giá trị rating ra component cha
     }
