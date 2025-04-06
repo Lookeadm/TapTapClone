@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, ActivityIndicator } from 'react-native'
+import { StyleSheet, Text, View, ActivityIndicator, Image } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux';
 import { Validate } from '../../utils/validate';
@@ -59,15 +59,12 @@ const LoginScreen = ({ navigation }) => {
     }
 
   return (
-    <ContainerComponent isImageBackground isScroll>
+    <ContainerComponent isScroll>
       <SectionComponent
-        styles={{
-          justifyContent: 'center',
-          alignItems: 'center'
-        }} children={undefined}>
-      </SectionComponent>
-
-      <SectionComponent>
+        styles={styles.container}
+      >
+        <Image source={require('../../../assets/images/611d6f87fdd30a78551869b353f837f8.webp')}
+        />
         <TextComponent size={24} title text="Sign in" />
         <SpaceComponent height={16} />
         <InputComponent
@@ -84,7 +81,7 @@ const LoginScreen = ({ navigation }) => {
           isPassword
           allowClear
         />
-        <RowComponent justify="space-between">
+        <RowComponent justify="space-between" styles={{width: '100%'}}>
           <RowComponent onPress={() => setIsRemember(!isRemember)}>
             <Switch
               trackColor={{ true: appColors.primary }}
@@ -108,6 +105,8 @@ const LoginScreen = ({ navigation }) => {
           text="SIGN IN"
           type='primary'
           disabled={isLoading}
+          textColor={appColors.black}
+          textWeigth={'bold'}
         />
         {isLoading && <ActivityIndicator size="small" color={appColors.primary} />}
       </SectionComponent>
@@ -115,7 +114,7 @@ const LoginScreen = ({ navigation }) => {
       <SectionComponent>
         <RowComponent justify="center">
           <TextComponent text="Don't have an account?" />
-          <ButtonComponent type="link" text="Sign up" onPress={() => navigation.navigate('Register')} />
+          <ButtonComponent text="Sign up" onPress={() => navigation.navigate('RegisterScreen')} textColor={appColors.green} textWeigth={'bold'}/>
         </RowComponent>
       </SectionComponent>
     </ContainerComponent>
@@ -124,4 +123,9 @@ const LoginScreen = ({ navigation }) => {
 
 export default LoginScreen
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+  container: {
+    alignItems: 'center',
+    justifyContent: 'center'
+  }
+})

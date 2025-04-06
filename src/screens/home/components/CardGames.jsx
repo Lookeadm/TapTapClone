@@ -19,19 +19,6 @@ const CardGames = ({
   description
 }) => {
 
-  const categories = () => {
-    genres.slice(0, 3).map((genre, index) => (
-      <View key={index} style={{ flexDirection: 'row', alignItems: 'center' }}>
-        <TextComponent
-          text={genre.name}
-          color={appColors.gray6}
-          size={12}
-        />
-        {index < item.categories.slice(0, 3).length - 1 && <SeparatorComponent />}
-      </View>
-    ))
-  }
-
   return topChart ? (
     <View>
       <SectionComponent>

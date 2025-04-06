@@ -1,15 +1,27 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { RowComponent, SectionComponent, TextComponent } from '../../components';
+import { RowComponent, SectionComponent, SpaceComponent, TextComponent } from '../../components';
 import { appColors } from '../../constants/appColors';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { removeAuth } from '../../redux/reducers/authReducer';
+import { useDispatch } from 'react-redux';
 
+const ProfileScreen = ({navigation}) => {
+    const dispatch = useDispatch();
+    const handleLogout = () => {
+    
+    dispatch(removeAuth());
+    // Reset stack và chuyển đến AuthNavigation
+    navigation.navigate('Auth');
+  };
 
-const ProfileScreen = () => {
     return (
         <View style={styles.container}>
             {/* Header Section */}
+            <SpaceComponent height={24}/>
             <SectionComponent>
-                <RowComponent>
+                <RowComponent justify={'space-between'}>
+                    <View>
                     <View style={styles.avatar}>
                         <Text style={styles.avatarText}>N</Text>
                     </View>
@@ -17,6 +29,13 @@ const ProfileScreen = () => {
                         <TextComponent text={"Nguyen Nhat Nam"} fontWeight={'bold'} color={appColors.white}/>
                         <TextComponent text={"ID: 356279125"} color={appColors.gray} size={12}/>
                     </View>
+                    </View>
+                    <TouchableOpacity style={styles.logoutButton} 
+                        onPress={()=>handleLogout()}
+                        
+                        >
+                        <Ionicons name="log-out" size={24} color={appColors.white} />
+                    </TouchableOpacity>
                 </RowComponent>
                 </SectionComponent>
             {/* Stats Section */}

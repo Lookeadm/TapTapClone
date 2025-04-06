@@ -1,9 +1,7 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import React, { useState } from 'react';
-import { Touchable } from 'react-native';
 import { TextInput } from 'react-native-gesture-handler';
 import { appColors } from '../constants/appColors';
-import { globalStyles } from '../styles/globalStyles';
 
 const InputComponent = ({
     value,
@@ -19,61 +17,71 @@ const InputComponent = ({
     const [isShowPass, setIsShowPass] = useState(isPassword ?? false);
 
     return (
-        <View style={[styles.inputContainer]}>
-            {affix ?? affix}
-            <TextInput 
-                style={[styles.input, globalStyles.text]}
+        <View style={styles.inputContainer}>
+            {/* affix nếu có */}
+            {affix && <Text style={styles.affixText}>{affix}</Text>}
+            
+            {/* TextInput */}
+            <TextInput
+                style={styles.input}
                 value={value}
                 placeholder={placeholder ?? ''}
-                onChangeText={val => onChange(val)}
+                onChangeText={onChange}
                 secureTextEntry={isShowPass}
-                placeholderTextColor={'#747688'}
-                keyboardType={type??'default'}
-                autoCapitalize='none'
+                placeholderTextColor="#7c7c7c"  // Màu chữ của placeholder
+                keyboardType={type ?? 'default'}
+                autoCapitalize="none"
                 onEndEditing={onEnd}
             />
-            {suffix ?? suffix}
+
+            {/* suffix nếu có */}
+            {suffix && <Text style={styles.suffixText}>{suffix}</Text>}
+
+            {/* Touchable để ẩn/hiện mật khẩu hoặc xóa giá trị */}
             <TouchableOpacity
-                onPress={
-                    isPassword ? () => setIsShowPass(!isShowPass) : () => onChange('')
-                }>
+                onPress={isPassword ? () => setIsShowPass(!isShowPass) : () => onChange('')}
+            >
                 {isPassword ? (
-                    // <FontAwesome 
-                    //     name={isShowPass ? 'eye-slash' : 'eye'} 
-                    //     size={22} 
-                    //     color={appColors.gray} />
-                    <View></View>
+                    <Text style={styles.iconText}>{isShowPass ? 'Show' : 'Hide'}</Text>
                 ) : (
-                    value?.length > 0 &&
-                    allowClear && (
-                        <View></View>
+                    value?.length > 0 && allowClear && (
+                        <Text style={styles.iconText}>Clear</Text>
                     )
                 )}
             </TouchableOpacity>
         </View>
-    )
-}
+    );
+};
+
 export default InputComponent;
 
 const styles = StyleSheet.create({
-    inputContainer:{
+    inputContainer: {
         flexDirection: 'row',
         borderRadius: 12,
-        borderWidth: 1,
         borderColor: appColors.gray3,
         width: '100%',
         minHeight: 56,
         justifyContent: 'center',
         alignItems: 'center',
         paddingHorizontal: 15,
-        backgroundColor: appColors.white,
-        marginBottom: 19
+        backgroundColor: '#333333',
+        marginBottom: 19,
     },
     input: {
-        padding: 0,
-        margin: 0,
         flex: 1,
         paddingHorizontal: 14,
-        color: appColors.text, 
+        color: appColors.white, 
+    },
+    affixText: {
+        color: appColors.primary,  
+        marginRight: 10,  
+    },
+    suffixText: {
+        color: appColors.primary,  
+        marginLeft: 10,  
+    },
+    iconText: {
+        color: appColors.gray,  
     }
 });

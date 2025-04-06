@@ -18,7 +18,6 @@ const MyTheme = {
 
 const App = () => {
   return (
-    <>
       <Provider store={store}>
         <StatusBar
           barStyle={"light-content"} // Đổi thành light cho dark theme
@@ -29,7 +28,7 @@ const App = () => {
           <AppRouters />
         </NavigationContainer>
       </Provider>
-    </>
+
   )
 }
 export default App;

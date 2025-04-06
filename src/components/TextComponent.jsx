@@ -35,7 +35,7 @@ const TextComponent = ({
         style={[
             globalStyles.text,
             {
-                color: color ?? appColors.text,
+                color: color ?? appColors.white,
                 flex: flex ?? 0,
                 fontSize: getFontSize(),
                 fontFamily: getFontFamily(),

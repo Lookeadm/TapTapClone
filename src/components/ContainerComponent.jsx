@@ -7,6 +7,7 @@ const ContainerComponent = ({
     isImageBackground,
     isScroll,
     children,
+    styles
 }) => {
     const returnContainer = isScroll ? (
         <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
@@ -26,7 +27,10 @@ const ContainerComponent = ({
             </SafeAreaView>
         </ImageBackground>
     ) : (
-        <View style={{flex: 1}}>
+        <View style={{
+            flex: 1,
+            backgroundColor: '#2424224'
+            }}>
             {returnContainer}
         </View>
     );

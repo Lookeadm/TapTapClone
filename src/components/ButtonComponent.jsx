@@ -56,6 +56,7 @@ const ButtonComponent = ({
                     ]}
                     flex={icon && iconFlex === 'right' ? 1 : 0}
                     font={textFont ?? fontFamilies.medium}
+                    fontWeight={textWeigth}
                 />
                 {icon && iconFlex === 'right' && icon}
             </TouchableOpacity>

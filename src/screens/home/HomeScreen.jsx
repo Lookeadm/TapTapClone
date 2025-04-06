@@ -1,7 +1,5 @@
 import { View, Text, TouchableOpacity, FlatList } from 'react-native'
 import React, { useEffect, useState, useRef } from 'react'
-import config from '../../apis/config'
-import { useDispatch } from 'react-redux';
 import { AppItem, Categories, CategoriesItem, Search } from './components';
 import { DividerComponent, RowComponent, SectionComponent, SeparatorComponent, SpaceComponent, TextComponent } from '../../components';
 import SwiperGames from './components/SwiperGames';
@@ -13,13 +11,9 @@ import { faBell } from '@fortawesome/free-solid-svg-icons';
 import Animated, {useSharedValue, withTiming, useAnimatedScrollHandler, useAnimatedStyle, interpolate, Extrapolate, useDerivedValue} from 'react-native-reanimated'
 import AxiosInstance from '../../apis/AxiosInstance';
 
-var apiKey = config.API_KEY;
-var url = config.API_URL;
 
 const CATEGORY_MAX_HEIGHT = 50;
 const CATEGORY_MIN_HEIGHT = 5;
-const CATEGORY_MAX_SCALE = 1;
-const CATEGORY_MIN_SCALE = 0;
 
 const HomeScreen = ({ navigation }) => {
     const [games, setGames] = useState([]);
@@ -87,7 +81,7 @@ const HomeScreen = ({ navigation }) => {
 
         return (
             <TouchableOpacity
-                onPress={() => navigation.navigate('Details', { id: item._id })}
+                onPress={() => navigation.navigate('Detail', { id: item._id })}
                 activeOpacity={1}
             >
                 <CardGames
@@ -104,7 +98,7 @@ const HomeScreen = ({ navigation }) => {
     const renderTopChart = ({ item, index }) => {
         return (
             <TouchableOpacity
-                onPress={() => navigation.navigate('Details', { id: item._id })}
+                onPress={() => navigation.navigate('Detail', { id: item._id })}
                 activeOpacity={1}
             >
                 <CardGames

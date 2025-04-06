@@ -2,27 +2,20 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import HomeScreen from '../screens/home/HomeScreen'
-import DetailsScreen from '../screens/details/DetailScreen';
-import SearchHistory from '../screens/search/components/SearchHistory';
 import SearchScreen from '../screens/search/SearchScreen';
 import ProfileScreen from '../screens/profile/ProfileScreen';
 import ReviewScreen from '../screens/details/ReviewScreen';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { appColors } from '../constants/appColors';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
-// Home stack
+// Home Stack
 const HomeStack = () => (
-  <Stack.Navigator
-      screenOptions={{
-        headerShown: false 
-      }}
-    >
-    <Stack.Screen name="Home" component={HomeScreen}/>
-    <Stack.Screen name="Details" component={DetailsScreen} />
-    <Stack.Screen name="Search" component={SearchScreen}/>
-    <Stack.Screen name="Profile" component={ProfileScreen}/>
-    <Stack.Screen name="Review" component={ReviewScreen}/>
+  <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Screen name="Home" component={HomeScreen} />
+    <Stack.Screen name="Review" component={ReviewScreen} />
   </Stack.Navigator>
 );
 
@@ -31,22 +24,35 @@ const BottomTabNavigator = () => {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
-        // tabBarIcon: ({ focused, color, size }) => {
-        //   const icons = {
-        //     Home: focused ? 'home' : 'home-outline',
-        //   };
-        //   return <Ionicons name={icons[route.name]} size={size} color={color} />;
-        // },
-        // tabBarActiveTintColor: 'tomato',
-        // tabBarInactiveTintColor: 'gray',
-        
+        headerShown: false,
+        tabBarIcon: ({ focused, color, size }) => {
+          let iconName = '';
+
+          switch (route.name) {
+            case 'Home':
+              iconName = focused ? 'home' : 'home-outline';
+              break;
+            case 'Search':
+              iconName = focused ? 'search' : 'search-outline';
+              break;
+            case 'Profile':
+              iconName = focused ? 'person' : 'person-outline';
+              break;
+            default:
+              iconName = 'ellipse-outline'; // fallback
+              break;
+          }
+
+          return <Ionicons name={iconName} size={size} color={color} />;
+        },
+        tabBarActiveTintColor: appColors.green,
+        tabBarInactiveTintColor: 'gray',
       })}
     >
-      <Tab.Screen name="Home" component={HomeStack} options={{ headerShown: false }} />
-      <Tab.Screen name="Search" component={SearchScreen} options={{ headerShown: false }} />
-      <Tab.Screen name="Profile" component={ProfileScreen} options={{ headerShown: false }} />
+      <Tab.Screen name="Home" component={HomeStack} />
+      <Tab.Screen name="Search" component={SearchScreen} />
+      <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
   );
 };
-
 export default BottomTabNavigator;
