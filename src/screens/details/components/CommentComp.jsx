@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, FlatList, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { io } from "socket.io-client";
 import { appInfo } from '../../../constants/appInfos';
@@ -11,25 +11,32 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 const CommentSection = ({ gameId }) => {
   const [reviews, setReviews] = useState([]);
   const [messages, setMessages] = useState([]);
-  const socket = io(appInfo.BASE_URL);
+  const [loading, setLoading] = useState(true);  // For loading state
+
+  const socketRef = useRef(null);
 
   useEffect(() => {
+    socketRef.current = io(appInfo.BASE_URL, {
+      transports: ["websocket"],
+    });
+
     // Lắng nghe sự kiện 'newPost'
-    socket.on('newPost', (data) => {
-        console.log(data.message); // In ra thông báo
-        setMessages(prevMessages => [...prevMessages, data.post]); // Cập nhật danh sách bài post mới
+    socketRef.current.on("newPost", (data) => {
+      if (data.post.gameId === gameId) {
+        setReviews((prevReviews) => [data.post, ...prevReviews]);
+        setMessages((prevMessages) => [...prevMessages, data.post]);
+      }
     });
 
     // Dọn dẹp khi component bị hủy
     return () => {
-        socket.off('newPost'); // Ngừng lắng nghe sự kiện khi component bị hủy
+      socketRef.current.disconnect();
     };
-}, []);
-console.log(messages);
+  }, [gameId]); // Added gameId dependency
 
   useEffect(() => {
     fetchReviews();
-  }, []);
+  }, [gameId]);
 
   const fetchReviews = async () => {
     try {
@@ -37,6 +44,8 @@ console.log(messages);
       setReviews(response.data);
     } catch (error) {
       console.error("Error fetching reviews:", error);
+    } finally {
+      setLoading(false);  // Stop loading state after fetch
     }
   };
 
@@ -46,6 +55,9 @@ console.log(messages);
     return formattedDate;
   }
 
+  console.log("New Post: " + JSON.stringify(messages));
+  console.log("Review: " + JSON.stringify(reviews));
+  
   return (
     <View>
       <Text style={{
@@ -57,16 +69,17 @@ console.log(messages);
         Comments
       </Text>
 
-      {reviews.length === 0 ? (
-        <Text style={{
-          color: appColors.gray,
-          textAlign: "center"
-        }}>
+      {loading ? (
+        <Text style={{ color: appColors.gray, textAlign: 'center' }}>
+          Loading comments...
+        </Text>
+      ) : reviews.length === 0 ? (
+        <Text style={{ color: appColors.gray, textAlign: 'center' }}>
           No comments yet
         </Text>
       ) : (
         reviews.map(item => (
-          <View style={styles.conatainer}>
+          <View style={styles.container} key={item._id}>
             <RowComponent justify={"space_between"} styles={{ marginBottom: 10 }}>
               <RowComponent>
                 <Image
@@ -93,6 +106,18 @@ console.log(messages);
           </View>
         ))
       )}
+
+      {/* Optionally render the messages */}
+      {messages.length > 0 && (
+        <View>
+          <Text style={{ color: appColors.white, marginTop: 20 }}>New Posts:</Text>
+          {messages.map((message, index) => (
+            <Text key={index} style={{ color: appColors.white }}>
+              {message.text} {/* Assuming "message.text" holds the content */}
+            </Text>
+          ))}
+        </View>
+      )}
     </View>
   );
 };
@@ -100,10 +125,10 @@ console.log(messages);
 export default CommentSection;
 
 const styles = StyleSheet.create({
-  conatainer: {
+  container: {
     backgroundColor: appColors.gray7,
     padding: 10,
     borderRadius: 10,
     marginBottom: 10
   }
-})
+});

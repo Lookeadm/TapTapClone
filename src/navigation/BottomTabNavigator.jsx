@@ -7,6 +7,7 @@ import ProfileScreen from '../screens/profile/ProfileScreen';
 import ReviewScreen from '../screens/details/ReviewScreen';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { appColors } from '../constants/appColors';
+import SocketScreen from '../socket/SocketScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
